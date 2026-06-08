@@ -1,0 +1,110 @@
+.localizacao {
+  background: var(--color-bg);
+}
+
+.localizacao__text {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 1.05rem;
+  margin-top: calc(-1 * var(--space-lg));
+  margin-bottom: var(--space-xl);
+}
+
+.localizacao__layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+/* Mapa */
+.localizacao__map {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+  aspect-ratio: 16 / 9;
+}
+
+.localizacao__map iframe {
+  width: 100%;
+  height: 100%;
+  filter: grayscale(0.4) contrast(1.05);
+}
+
+/* Contato */
+.localizacao__contato {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.localizacao__contato-title {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-xs);
+}
+
+.contato-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+  border: 1px solid transparent;
+}
+
+.contato-btn svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.contato-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.92;
+}
+
+.contato-btn--whatsapp {
+  background: #25D366;
+  color: #fff;
+}
+
+.contato-btn--whatsapp:hover {
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+}
+
+.contato-btn--instagram {
+  background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  color: #fff;
+}
+
+.contato-btn--instagram:hover {
+  box-shadow: 0 4px 20px rgba(220, 39, 67, 0.4);
+}
+
+@media (max-width: 860px) {
+  .localizacao__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .localizacao__map {
+    aspect-ratio: 4 / 3;
+  }
+
+  .localizacao__contato {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .contato-btn {
+    flex: 1;
+    min-width: 160px;
+    justify-content: center;
+  }
+}

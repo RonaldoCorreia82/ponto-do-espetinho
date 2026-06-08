@@ -1,0 +1,181 @@
+/* ============================================================
+   Login — Ponto do Espetinho
+============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --amber:    #f59e0b;
+  --amber-d:  #d97706;
+  --bg:       #0c0c0c;
+  --surface:  #161616;
+  --border:   #2a2a2a;
+  --text:     #f3f3f3;
+  --muted:    #6b7280;
+  --red:      #ef4444;
+  --radius:   12px;
+  --font: 'Inter', system-ui, sans-serif;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Background com gradiente sutil ── */
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,158,11,.12) 0%, transparent 70%),
+    var(--bg);
+}
+
+/* ── Card ── */
+.login-wrap {
+  width: 100%;
+  max-width: 420px;
+  padding: 24px 16px;
+}
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px 40px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,.55);
+}
+
+/* ── Logo ── */
+.login-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.login-logo img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: 16px;
+  background: rgba(245,158,11,.1);
+  padding: 8px;
+}
+
+.login-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: -.3px;
+}
+.login-sub {
+  font-size: .85rem;
+  color: var(--muted);
+  margin-bottom: 36px;
+}
+
+/* ── Campos ── */
+.field { text-align: left; margin-bottom: 18px; }
+
+.field-label {
+  display: block;
+  font-size: .8rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 8px;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.field-input {
+  width: 100%;
+  padding: 13px 16px;
+  background: #1f1f1f;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: .95rem;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color .2s;
+}
+.field-input:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px rgba(245,158,11,.12);
+}
+.field-input::placeholder { color: #444; }
+
+/* Campo senha com botão */
+.field-password { position: relative; }
+.field-password .field-input { padding-right: 48px; }
+
+.field-eye {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color .2s;
+}
+.field-eye:hover { color: var(--text); }
+.field-eye .eye-close { display: none; }
+
+/* ── Erro ── */
+.login-error {
+  background: rgba(239,68,68,.12);
+  border: 1px solid rgba(239,68,68,.3);
+  color: #fca5a5;
+  font-size: .87rem;
+  padding: 11px 14px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+/* ── Botão principal ── */
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--amber);
+  color: #0c0c0c;
+  font-size: .97rem;
+  font-weight: 700;
+  font-family: var(--font);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background .2s, transform .1s;
+}
+.login-btn:hover:not(:disabled) { background: var(--amber-d); }
+.login-btn:active:not(:disabled) { transform: scale(.98); }
+.login-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+/* ── Spinner ── */
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(0,0,0,.2);
+  border-top-color: #0c0c0c;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Responsivo ── */
+@media (max-width: 480px) {
+  .login-card { padding: 36px 24px; }
+}

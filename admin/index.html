@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Admin — Ponto do Espetinho</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles/admin.css" />
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <!-- ░░ SIDEBAR ░░ -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-header">
+      <img src="/logomarca.png" alt="Ponto do Espetinho" class="sidebar-logo" />
+      <div>
+        <div class="sidebar-title">Espetinho</div>
+        <div class="sidebar-sub">Painel Admin</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" role="navigation">
+
+      <a href="#" class="nav-item active" data-section="dashboard" aria-label="Dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="14" y="3" width="7" height="7" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="3" y="14" width="7" height="7" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="14" y="14" width="7" height="7" rx="1" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Dashboard
+      </a>
+
+      <a href="#" class="nav-item" data-section="nova-venda" aria-label="Nova Venda">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nova Venda
+      </a>
+
+      <a href="#" class="nav-item" data-section="historico" aria-label="Histórico">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+        </svg>
+        Histórico
+      </a>
+
+      <a href="#" class="nav-item" data-section="produtos" aria-label="Produtos">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+        </svg>
+        Produtos
+      </a>
+
+      <a href="#" class="nav-item" data-section="saidas" aria-label="Saídas">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        Saídas
+      </a>
+
+      <a href="#" class="nav-item" data-section="relatorio" aria-label="Relatório">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        Relatório
+      </a>
+
+      <a href="#" class="nav-item" data-section="clientes" aria-label="Clientes">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Clientes
+      </a>
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <button id="btnLogout" class="logout-btn" type="button" onclick="sairAdmin()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        Sair
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ░░ MAIN ░░ -->
+  <div class="admin-main">
+
+    <header class="admin-header">
+      <button id="menuToggle" class="menu-toggle" type="button" aria-label="Abrir menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <h1 id="sectionTitle" class="header-title">Dashboard</h1>
+      <div id="reloginho" class="reloginho" aria-live="polite" aria-label="Horário de Salvador"></div>
+      <div class="header-user">
+        <span class="user-dot"></span>
+        <span>Espetinho</span>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- ════════ DASHBOARD ════════ -->
+      <section id="sec-dashboard" class="admin-section active">
+
+        <div class="stats-wrapper">
+          <div class="stats-grid">
+            <!-- Vendas -->
+            <div class="stat-card">
+              <div class="stat-card-label">Receita Hoje</div>
+              <div class="stat-card-val" id="stat-receita-hoje">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">Vendas Hoje</div>
+              <div class="stat-card-val" id="stat-vendas-hoje">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">Receita no Mês</div>
+              <div class="stat-card-val" id="stat-receita-mes">—</div>
+            </div>
+            <!-- Divisor -->
+            <hr class="stats-divider" />
+            <!-- Saídas -->
+            <div class="stat-card stat-card--red">
+              <div class="stat-card-label">Saídas Hoje</div>
+              <div class="stat-card-val" id="stat-saidas-hoje">—</div>
+            </div>
+            <div class="stat-card stat-card--red">
+              <div class="stat-card-label">Saídas no Mês</div>
+              <div class="stat-card-val" id="stat-saidas-mes">—</div>
+            </div>
+            <div class="stat-card" id="stat-resultado-card">
+              <div class="stat-card-label">Resultado do Mês</div>
+              <div class="stat-card-val" id="stat-resultado-mes">—</div>
+            </div>
+          </div>
+
+          <!-- Receita Total — canto direito -->
+          <div class="stat-card stat-card--total">
+            <div class="stat-card-label">Receita Total</div>
+            <div class="stat-card-val" id="stat-receita-total">—</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Últimas Vendas</h2>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data / Hora</th>
+                  <th>Cliente</th>
+                  <th>Itens</th>
+                  <th>Total</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="recentSalesBody">
+                <tr><td colspan="4" class="table-empty">Carregando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:20px">
+          <h2 class="card-title">Últimas Saídas</h2>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Item</th>
+                  <th>Valor</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="recentSaidasBody">
+                <tr><td colspan="4" class="table-empty">Carregando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ════════ NOVA VENDA ════════ -->
+      <section id="sec-nova-venda" class="admin-section">
+        <div id="produtosGrid">
+          <div class="loading-row">Carregando produtos…</div>
+        </div>
+      </section>
+
+      <!-- ════════ HISTÓRICO ════════ -->
+      <section id="sec-historico" class="admin-section">
+        <div class="card">
+
+          <div class="historico-filters">
+            <div class="field-row">
+              <div class="field">
+                <label class="field-label" for="filtroAno">Ano</label>
+                <select id="filtroAno" class="field-input field-select hist-select"
+                  onchange="document.getElementById('filtroData').value=''; document.getElementById('filtroMes').value=''; loadHistorico()">
+                  <option value="">Todos os anos</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="filtroMes">Mês</label>
+                <select id="filtroMes" class="field-input field-select hist-select"
+                  onchange="document.getElementById('filtroData').value=''; document.getElementById('filtroAno').value=''; loadHistorico()">
+                  <option value="">Todos os meses</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="filtroData">Data específica</label>
+                <input type="date" id="filtroData" class="field-input" style="width:auto"
+                  onchange="document.getElementById('filtroMes').value=''; document.getElementById('filtroAno').value=''; loadHistorico()" />
+              </div>
+              <button class="btn-secondary" type="button" onclick="limparFiltroHistorico()">
+                Limpar
+              </button>
+            </div>
+          </div>
+
+          <div id="historicoTotalAno" style="display:none" class="historico-total-ano">
+            <span class="hta-label">Total do Ano <span id="historicoTotalAnoLabel"></span></span>
+            <span id="historicoTotalAnoValor" class="hta-valor"></span>
+          </div>
+
+          <div id="historicoContainer">
+            <div class="loading-row">Carregando…</div>
+          </div>
+
+          <div id="paginacao" class="paginacao"></div>
+
+        </div>
+      </section>
+
+      <!-- ════════ PRODUTOS ════════ -->
+      <section id="sec-produtos" class="admin-section">
+        <div class="section-toolbar">
+          <button class="btn-secondary" type="button" onclick="novaCategoria()">
+            📦&nbsp; + Categoria
+          </button>
+          <button class="btn-primary" type="button" onclick="novoProduto()">
+            ➕&nbsp; + Produto
+          </button>
+        </div>
+        <div id="produtosAdmin" class="produtos-grid">
+          <div class="loading-row">Carregando…</div>
+        </div>
+      </section>
+
+      <!-- ════════ SAÍDAS ════════ -->
+      <section id="sec-saidas" class="admin-section">
+
+        <!-- Formulário rápido -->
+        <div class="card" style="margin-bottom:20px">
+          <h2 class="card-title">➕ Registrar Saída</h2>
+          <div class="field-row saida-form-row">
+            <div class="field">
+              <label class="field-label" for="saidaData">Data</label>
+              <input type="date" id="saidaData" class="field-input" />
+            </div>
+            <div class="field saida-desc-field">
+              <label class="field-label" for="saidaDesc">Item / Descrição</label>
+              <input type="text" id="saidaDesc" class="field-input"
+                placeholder="Ex: Gás, Carvão, Transporte…" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="saidaValor">Valor (R$)</label>
+              <input type="number" id="saidaValor" class="field-input saida-valor-input"
+                min="0" step="0.01" placeholder="0,00" inputmode="decimal" />
+            </div>
+            <div class="field saida-btn-field">
+              <label class="field-label">&nbsp;</label>
+              <button class="btn-primary" type="button" onclick="adicionarSaida()">
+                ➕&nbsp; Adicionar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtros + tabela -->
+        <div class="card">
+          <div class="historico-filters">
+            <div class="field-row">
+              <div class="field">
+                <label class="field-label" for="filtroSaidaMes">Mês</label>
+                <select id="filtroSaidaMes" class="field-input field-select hist-select"
+                  onchange="document.getElementById('filtroSaidaData').value=''; loadSaidas()">
+                  <option value="">Todos os meses</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="filtroSaidaData">Data específica</label>
+                <input type="date" id="filtroSaidaData" class="field-input" style="width:auto"
+                  onchange="document.getElementById('filtroSaidaMes').value=''; loadSaidas()" />
+              </div>
+              <button class="btn-secondary" type="button" onclick="limparFiltroSaidas()">Limpar</button>
+            </div>
+          </div>
+          <div id="saidasContainer">
+            <div class="loading-row">Carregando…</div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ════════ RELATÓRIO ════════ -->
+      <section id="sec-relatorio" class="admin-section">
+        <div class="card">
+
+          <div class="relatorio-header">
+            <h2 class="card-title" style="margin-bottom:0">Relatório de Vendas</h2>
+            <div class="field-row">
+              <div class="field">
+                <label class="field-label" for="filtroPeriodo">Período</label>
+                <select id="filtroPeriodo" class="field-input field-select" style="width:auto">
+                  <option value="7">Últimos 7 dias</option>
+                  <option value="15">Últimos 15 dias</option>
+                  <option value="30">Últimos 30 dias</option>
+                  <option value="90">Últimos 90 dias</option>
+                </select>
+              </div>
+              <button class="btn-primary" type="button" onclick="loadRelatorio()">Atualizar</button>
+            </div>
+          </div>
+
+          <div id="relatorioContainer">
+            <div class="loading-row">Carregando…</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════ CLIENTES ════════ -->
+      <section id="sec-clientes" class="admin-section">
+        <div class="card">
+
+          <div class="relatorio-header">
+            <h2 class="card-title" style="margin-bottom:0">👥 Clientes</h2>
+            <div class="field-row">
+              <div class="field">
+                <label class="field-label" for="clientePeriodo">Período</label>
+                <select id="clientePeriodo" class="field-input field-select" style="width:auto"
+                  onchange="loadRelatorioClientes()">
+                  <option value="0">Todo o período</option>
+                  <option value="7">Últimos 7 dias</option>
+                  <option value="30">Últimos 30 dias</option>
+                  <option value="90">Últimos 90 dias</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="clienteBusca">Buscar</label>
+                <input type="text" id="clienteBusca" class="field-input"
+                  style="min-width:180px" placeholder="Nome do cliente…"
+                  autocomplete="off" oninput="loadRelatorioClientes()" />
+              </div>
+              <button class="btn-primary" type="button" onclick="loadRelatorioClientes()">Atualizar</button>
+            </div>
+          </div>
+
+          <div id="clientesContainer">
+            <div class="loading-row">Carregando…</div>
+          </div>
+
+        </div>
+      </section>
+
+    </div><!-- /admin-content -->
+  </div><!-- /admin-main -->
+
+</div><!-- /admin-layout -->
+
+<div id="sidebarOverlay"></div>
+
+<!-- ░░ MODAL EDITAR VENDA ░░ -->
+<div id="editModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Editar Venda">
+  <div class="modal-card">
+
+    <div class="modal-header">
+      <h2 class="modal-title">✏️ Editar Venda</h2>
+      <button class="modal-close" type="button" onclick="fecharEditModal()" aria-label="Fechar">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label" for="editData">Data / Hora (Salvador)</label>
+        <input type="datetime-local" id="editData" class="field-input" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="editCliente">👤 Cliente</label>
+        <input type="text" id="editCliente" class="field-input" placeholder="Nome do cliente (opcional)" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="editTotal">💰 Total (R$)</label>
+        <input type="number" id="editTotal" class="field-input" min="0" step="0.01"
+          oninput="calcEditTroco()" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="editDinheiro">💵 Dinheiro</label>
+          <input type="number" id="editDinheiro" class="field-input" min="0" step="0.01"
+            oninput="calcEditTroco()" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="editPix">📱 PIX</label>
+          <input type="number" id="editPix" class="field-input" min="0" step="0.01"
+            oninput="calcEditTroco()" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="editTroco">↩ Troco (automático)</label>
+        <input type="number" id="editTroco" class="field-input" readonly
+          tabindex="-1" style="opacity:.55;cursor:default" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" type="button" onclick="fecharEditModal()">Cancelar</button>
+      <button class="btn-primary"   type="button" id="btnSalvarEdicao" onclick="salvarEdicao()">Salvar</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ░░ MODAL PRODUTO (novo / editar) ░░ -->
+<div id="editProdModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Produto">
+  <div class="modal-card">
+
+    <div class="modal-header">
+      <h2 class="modal-title" id="editProdModalTitle">✏️ Editar Produto</h2>
+      <button class="modal-close" type="button" onclick="fecharEditProdModal()" aria-label="Fechar">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label" for="editProdNome">Nome</label>
+        <input type="text" id="editProdNome" class="field-input" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="editProdPreco">Preço (R$)</label>
+        <input type="number" id="editProdPreco" class="field-input" min="0" step="0.01" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="editProdCat">Categoria</label>
+        <select id="editProdCat" class="field-input field-select"></select>
+      </div>
+      <div class="field" style="flex-direction:row;align-items:center;gap:12px">
+        <label class="prod-toggle">
+          <input type="checkbox" id="editProdAtivo" />
+          Produto ativo (aparece na venda)
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" type="button" onclick="fecharEditProdModal()">Cancelar</button>
+      <button class="btn-primary"   type="button" id="btnSalvarProd" onclick="salvarProduto()">Salvar</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ░░ MODAL NOVA CATEGORIA ░░ -->
+<div id="novaCatModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Nova Categoria">
+  <div class="modal-card">
+
+    <div class="modal-header">
+      <h2 class="modal-title">📦 Nova Categoria</h2>
+      <button class="modal-close" type="button" onclick="fecharNovaCatModal()" aria-label="Fechar">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label" for="novaCatNome">Nome da categoria</label>
+        <input type="text" id="novaCatNome" class="field-input" placeholder="Ex: Sobremesas" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="novaCatIcone">Ícone (emoji)</label>
+        <input type="text" id="novaCatIcone" class="field-input" placeholder="Ex: 🍰" maxlength="8" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" type="button" onclick="fecharNovaCatModal()">Cancelar</button>
+      <button class="btn-primary"   type="button" onclick="salvarNovaCategoria()">Criar</button>
+    </div>
+
+  </div>
+</div>
+
+<script type="module" src="/src/js/admin/admin.js"></script>
+</body>
+</html>

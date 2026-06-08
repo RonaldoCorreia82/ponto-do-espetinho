@@ -1,0 +1,113 @@
+.bebidas {
+  background: var(--color-surface);
+  position: relative;
+  overflow: hidden;
+}
+
+.bebidas::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+}
+
+.bebidas::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+}
+
+.bebidas__grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
+.bebida-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  min-width: 200px;
+  flex: 1;
+  max-width: 260px;
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+  box-shadow: var(--shadow-card);
+}
+
+.bebida-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-card), var(--shadow-glow);
+}
+
+.bebida-card__img-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.bebida-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.bebida-card:hover .bebida-card__img {
+  transform: scale(1.06);
+}
+
+.bebida-card__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-sm) var(--space-md);
+  width: 100%;
+  text-align: center;
+}
+
+.bebida-card__name {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.bebida-card__vol {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.bebida-card__price {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin-top: 2px;
+}
+
+@media (max-width: 560px) {
+  .bebidas__grid {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bebida-card {
+    max-width: 100%;
+  }
+}
