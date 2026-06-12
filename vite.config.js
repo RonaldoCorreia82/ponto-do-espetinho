@@ -10,6 +10,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main:       resolve(__dirname, 'index.html'),
+        fiado:      resolve(__dirname, 'fiado.html'),
         adminLogin: resolve(__dirname, 'admin/login.html'),
         adminPanel: resolve(__dirname, 'admin/index.html'),
         cardapio:   resolve(__dirname, 'cardapio/index.html'),
