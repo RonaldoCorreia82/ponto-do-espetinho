@@ -1732,10 +1732,9 @@ async function renderFiadoTabela() {
       </tr>`
   }).join('')
 
-  // Paginação
-  const pg = document.getElementById('fiadoPaginacao')
-  if (totalPg <= 1) { pg.innerHTML = ''; return }
-  const info = `<span style="font-size:.8rem;color:var(--muted)">${rows.length} lançamentos — pág. ${fiadoPage} de ${totalPg}</span>`
+  // Paginação (sempre visível)
+  const pg   = document.getElementById('fiadoPaginacao')
+  const info = `<span style="font-size:.8rem;color:var(--muted)">${rows.length} lançamento(s) — pág. ${fiadoPage} de ${totalPg}</span>`
   const btn  = (label, page, disabled) =>
     `<button onclick="fiadoIrPagina(${page})" class="btn-secondary"
       style="padding:4px 10px;font-size:.8rem" ${disabled ? 'disabled' : ''}>${label}</button>`
