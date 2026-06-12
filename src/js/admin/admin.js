@@ -1531,6 +1531,7 @@ window.adicionarSaida        = adicionarSaida
 window.deletarSaida          = deletarSaida
 window.loadSaidas            = loadSaidas
 window.limparFiltroSaidas    = limparFiltroSaidas
+window.fiadoIrPagina         = (p) => { fiadoPage = p; renderFiadoTabela() }
 
 // ═══════════════════════════════════════════════════════════════
 // FIADO — Supabase
@@ -1539,8 +1540,10 @@ const fmtR  = (v) => Number(v).toLocaleString('pt-BR', { style:'currency', curre
 const fIni  = (n) => n.trim().split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase()
 const fData = (ts)=> new Date(ts).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})
 
+const FIADO_PER_PAGE = 20
 let fiadoFiltro  = 'todos'
 let fiadoBusca   = ''
+let fiadoPage    = 1
 let fiadoInited  = false
 let fiadoPending = null
 
@@ -1574,18 +1577,6 @@ async function initFiado() {
     if (e.key === 'Enter') document.getElementById('btnSalvarCliente').click()
   })
 
-  // Delegação: deletar cliente
-  document.getElementById('fiadoClientesGrid').addEventListener('click', e => {
-    const btn = e.target.closest('[data-del-cliente]')
-    if (!btn) return
-    const cId   = btn.dataset.delCliente
-    const cNome = btn.closest('.fiado-cliente-card')?.querySelector('.fiado-cliente-nome')?.textContent || ''
-    fiadoConfirm(`Remover "${cNome}"? Os lançamentos também serão excluídos.`, async () => {
-      const { error } = await supabase.from('clientes_fiado').delete().eq('id', cId)
-      if (error) { showToast('Erro ao remover cliente.', 'error'); return }
-      await renderFiadoAll()
-    })
-  })
 
   // Novo fiado
   document.getElementById('btnNovoFiado').addEventListener('click', () => {
@@ -1624,6 +1615,7 @@ async function initFiado() {
       document.querySelectorAll('.fiado-filtro').forEach(b => b.classList.remove('active'))
       btn.classList.add('active')
       fiadoFiltro = btn.dataset.f
+      fiadoPage = 1
       await renderFiadoTabela()
     })
   })
@@ -1631,6 +1623,7 @@ async function initFiado() {
   // Busca por cliente
   document.getElementById('fiadoBusca').addEventListener('input', async e => {
     fiadoBusca = e.target.value.trim().toLowerCase()
+    fiadoPage = 1
     await renderFiadoTabela()
   })
 
@@ -1682,24 +1675,9 @@ function fiadoModalClose() {
 
 async function renderFiadoClientes() {
   const { data: clientes } = await supabase.from('clientes_fiado').select('*')
-
-  const grid  = document.getElementById('fiadoClientesGrid')
-  const empty = document.getElementById('fiadoClientesEmpty')
-  const list  = (clientes || []).sort((a, b) =>
+  const list = (clientes || []).sort((a, b) =>
     a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }))
 
-  empty.style.display = list.length ? 'none' : 'block'
-  grid.innerHTML = list.map(c => `
-      <div class="fiado-cliente-card">
-        <div class="fiado-avatar">${fIni(c.nome)}</div>
-        <div class="fiado-cliente-info">
-          <div class="fiado-cliente-nome">${c.nome}</div>
-          <div class="fiado-cliente-tel">${c.tel || 'Sem telefone'}</div>
-        </div>
-        <button class="fiado-del-btn" data-del-cliente="${c.id}" title="Remover">✕</button>
-      </div>`).join('')
-
-  // Atualiza select
   const sel  = document.getElementById('fClienteSel')
   const prev = sel.value
   sel.innerHTML = '<option value="">Selecione um cliente</option>' +
@@ -1724,13 +1702,18 @@ async function renderFiadoTabela() {
     rows = rows.filter(f => (f.clientes_fiado?.nome ?? '').toLowerCase().includes(fiadoBusca))
   rows.sort((a, b) =>
     (a.clientes_fiado?.nome ?? '').localeCompare(b.clientes_fiado?.nome ?? '', 'pt-BR', { sensitivity: 'base' }))
-  const tbody = document.getElementById('fiadoTbody')
+
+  const tbody   = document.getElementById('fiadoTbody')
+  const totalPg = Math.ceil(rows.length / FIADO_PER_PAGE) || 1
+  if (fiadoPage > totalPg) fiadoPage = totalPg
+  const page    = rows.slice((fiadoPage - 1) * FIADO_PER_PAGE, fiadoPage * FIADO_PER_PAGE)
 
   if (!rows.length) {
     tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Nenhum lançamento encontrado.</td></tr>'
+    document.getElementById('fiadoPaginacao').innerHTML = ''
     return
   }
-  tbody.innerHTML = rows.map(f => {
+  tbody.innerHTML = page.map(f => {
     const nome = f.clientes_fiado?.nome ?? 'Cliente removido'
     const pago = f.status === 'pago'
     return `
@@ -1748,6 +1731,22 @@ async function renderFiadoTabela() {
         </td>
       </tr>`
   }).join('')
+
+  // Paginação
+  const pg = document.getElementById('fiadoPaginacao')
+  if (totalPg <= 1) { pg.innerHTML = ''; return }
+  const info = `<span style="font-size:.8rem;color:var(--muted)">${rows.length} lançamentos — pág. ${fiadoPage} de ${totalPg}</span>`
+  const btn  = (label, page, disabled) =>
+    `<button onclick="fiadoIrPagina(${page})" class="btn-secondary"
+      style="padding:4px 10px;font-size:.8rem" ${disabled ? 'disabled' : ''}>${label}</button>`
+  pg.innerHTML = `
+    ${info}
+    <div style="display:flex;gap:4px">
+      ${btn('«', 1,           fiadoPage === 1)}
+      ${btn('‹', fiadoPage-1, fiadoPage === 1)}
+      ${btn('›', fiadoPage+1, fiadoPage === totalPg)}
+      ${btn('»', totalPg,     fiadoPage === totalPg)}
+    </div>`
 }
 
 async function renderFiadoAll() {
