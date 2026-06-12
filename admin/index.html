@@ -487,11 +487,17 @@
             </div>
           </div>
 
-          <!-- Filtros -->
-          <div class="fiado-filtros" style="margin:16px 0 12px">
-            <button class="fiado-filtro active" data-f="todos">Todos</button>
-            <button class="fiado-filtro" data-f="aberto">Em aberto</button>
-            <button class="fiado-filtro" data-f="pago">Pagos</button>
+          <!-- Filtros + Busca -->
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:16px 0 12px">
+            <div class="fiado-filtros" style="margin:0">
+              <button class="fiado-filtro active" data-f="todos">Todos</button>
+              <button class="fiado-filtro" data-f="aberto">Em aberto</button>
+              <button class="fiado-filtro" data-f="pago">Pagos</button>
+            </div>
+            <input id="fiadoBusca" type="search" placeholder="Buscar por cliente…"
+              style="flex:1;min-width:160px;padding:6px 12px;border-radius:6px;
+                     border:1px solid var(--border);background:var(--surface);
+                     color:var(--text);font-size:.875rem;outline:none" />
           </div>
 
           <!-- Tabela -->

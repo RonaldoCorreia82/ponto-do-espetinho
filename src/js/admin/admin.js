@@ -1540,6 +1540,7 @@ const fIni  = (n) => n.trim().split(' ').slice(0,2).map(p=>p[0]).join('').toUppe
 const fData = (ts)=> new Date(ts).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})
 
 let fiadoFiltro  = 'todos'
+let fiadoBusca   = ''
 let fiadoInited  = false
 let fiadoPending = null
 
@@ -1625,6 +1626,12 @@ async function initFiado() {
       fiadoFiltro = btn.dataset.f
       await renderFiadoTabela()
     })
+  })
+
+  // Busca por cliente
+  document.getElementById('fiadoBusca').addEventListener('input', async e => {
+    fiadoBusca = e.target.value.trim().toLowerCase()
+    await renderFiadoTabela()
   })
 
   // Delegação: pagar / deletar lançamento
@@ -1722,7 +1729,9 @@ async function renderFiadoTabela() {
   document.getElementById('fTotalPago').textContent   = fmtR(pagos.reduce((s,f) => s + Number(f.valor), 0))
   document.getElementById('fTotalCount').textContent  = fiados.length
 
-  const rows  = fiadoFiltro === 'todos' ? fiados : fiados.filter(f => f.status === fiadoFiltro)
+  let rows = fiadoFiltro === 'todos' ? fiados : fiados.filter(f => f.status === fiadoFiltro)
+  if (fiadoBusca)
+    rows = rows.filter(f => (f.clientes_fiado?.nome ?? '').toLowerCase().includes(fiadoBusca))
   const tbody = document.getElementById('fiadoTbody')
 
   if (!rows.length) {
