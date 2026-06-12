@@ -1,0 +1,563 @@
+/* garante que [hidden] não seja sobrescrito por display de outros seletores */
+[hidden] { display: none !important; }
+
+/* ── Layout base ── */
+body {
+  background: var(--color-bg);
+}
+
+/* ── Header interno ── */
+.fiado-header {
+  background: rgba(26, 15, 7, 0.98);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-sm) 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.fiado-header__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.fiado-header__logo img {
+  height: 48px;
+  width: auto;
+  filter: drop-shadow(0 0 6px rgba(232, 93, 4, 0.4));
+}
+
+.fiado-header__title {
+  flex: 1;
+}
+
+.fiado-header__title h1 {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.fiado-header__title span {
+  font-size: 0.78rem;
+  color: var(--color-primary);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fiado-header__back {
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.fiado-header__back:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+  background: transparent;
+  transform: none;
+}
+
+/* ── Main ── */
+.fiado-main {
+  padding: var(--space-xl) 0 var(--space-2xl);
+}
+
+/* ── Seção ── */
+.fiado-section {
+  margin-bottom: var(--space-2xl);
+}
+
+.fiado-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.fiado-section__title {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.fiado-section__sub {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* ── Separador entre seções ── */
+.fiado-section + .fiado-section {
+  padding-top: var(--space-2xl);
+  border-top: 1px solid var(--color-border);
+}
+
+/* ── Formulário ── */
+.fiado-form {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  animation: fadeSlideUp 0.25s ease;
+}
+
+.fiado-form__title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--color-text);
+  margin-bottom: var(--space-md);
+}
+
+.fiado-form__row {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-md);
+}
+
+.fiado-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.fiado-form__field--full {
+  flex: 1 1 100%;
+}
+
+.fiado-form__field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.fiado-form__field input,
+.fiado-form__field select {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 0.65rem 0.9rem;
+  transition: border-color var(--transition);
+  outline: none;
+  width: 100%;
+}
+
+.fiado-form__field input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+.fiado-form__field input:focus,
+.fiado-form__field select:focus {
+  border-color: var(--color-primary);
+}
+
+.fiado-form__field select option {
+  background: var(--color-surface);
+}
+
+.fiado-form__actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+/* ── Botão ghost ── */
+.btn--ghost {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.btn--ghost:hover {
+  background: transparent;
+  border-color: var(--color-primary);
+  color: var(--color-text);
+  transform: none;
+}
+
+/* ── Grid de clientes ── */
+.clientes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-sm);
+}
+
+.cliente-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  transition: border-color var(--transition);
+}
+
+.cliente-card:hover {
+  border-color: var(--color-primary);
+}
+
+.cliente-card__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.cliente-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cliente-card__nome {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cliente-card__tel {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.cliente-card__divida {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cliente-card__divida--aberto { color: var(--color-primary-light); }
+.cliente-card__divida--zerado { color: #4caf50; }
+
+.cliente-card__del {
+  background: none;
+  border: none;
+  color: var(--color-border);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color var(--transition), background var(--transition);
+  flex-shrink: 0;
+}
+
+.cliente-card__del:hover {
+  color: #e53935;
+  background: rgba(229, 57, 53, 0.1);
+}
+
+/* ── Filtros ── */
+.fiado-filtros {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.filtro-btn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.35rem 1rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.filtro-btn:hover,
+.filtro-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+/* ── Resumo ── */
+.fiado-resumo {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.resumo-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resumo-card__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.resumo-card__valor {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.resumo-card--total { border-top: 3px solid var(--color-primary); }
+.resumo-card--total .resumo-card__valor { color: var(--color-primary-light); }
+
+.resumo-card--pago  { border-top: 3px solid #4caf50; }
+.resumo-card--pago  .resumo-card__valor { color: #4caf50; }
+
+.resumo-card--count { border-top: 3px solid var(--color-accent); }
+.resumo-card--count .resumo-card__valor { color: var(--color-accent); }
+
+/* ── Lista de fiado ── */
+.fiado-lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.fiado-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  transition: border-color var(--transition);
+  animation: fadeSlideUp 0.2s ease;
+}
+
+.fiado-item:hover {
+  border-color: var(--color-border);
+}
+
+.fiado-item--pago {
+  opacity: 0.55;
+}
+
+.fiado-item__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.fiado-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.fiado-item__nome {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.fiado-item__desc {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fiado-item__data {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.fiado-item__valor {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-primary-light);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 80px;
+  text-align: right;
+}
+
+.fiado-item--pago .fiado-item__valor {
+  color: #4caf50;
+  text-decoration: line-through;
+}
+
+.fiado-item__actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.fiado-item__btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.fiado-item__btn--pagar {
+  border-color: #4caf50;
+  color: #4caf50;
+}
+
+.fiado-item__btn--pagar:hover {
+  background: #4caf50;
+  color: #fff;
+}
+
+.fiado-item__btn--del:hover {
+  border-color: #e53935;
+  color: #e53935;
+  background: rgba(229, 57, 53, 0.08);
+}
+
+.fiado-item__badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.fiado-item__badge--aberto {
+  background: rgba(232, 93, 4, 0.15);
+  color: var(--color-primary-light);
+  border: 1px solid rgba(232, 93, 4, 0.3);
+}
+
+.fiado-item__badge--pago {
+  background: rgba(76, 175, 80, 0.12);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.25);
+}
+
+/* ── Empty state ── */
+.fiado-empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--space-xl) 0;
+  font-size: 0.95rem;
+}
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.15s ease;
+}
+
+.modal {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  max-width: 360px;
+  width: 90%;
+  animation: fadeSlideUp 0.2s ease;
+}
+
+.modal__msg {
+  font-size: 1rem;
+  color: var(--color-text);
+  margin-bottom: var(--space-md);
+  line-height: 1.5;
+}
+
+.modal__actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* ── Responsivo ── */
+@media (max-width: 640px) {
+  .fiado-resumo {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .resumo-card--count {
+    grid-column: 1 / -1;
+  }
+
+  .fiado-item__data {
+    display: none;
+  }
+
+  .fiado-header__back span {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .fiado-resumo {
+    grid-template-columns: 1fr;
+  }
+
+  .resumo-card--count {
+    grid-column: auto;
+  }
+}

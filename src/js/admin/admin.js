@@ -76,7 +76,8 @@ async function showSection(name) {
   currentSection = name
   const TITLES = { dashboard:'Dashboard', 'nova-venda':'Nova Venda',
                    historico:'Histórico de Vendas', relatorio:'Relatório',
-                   produtos:'Produtos', saidas:'Saídas', clientes:'Clientes' }
+                   produtos:'Produtos', saidas:'Saídas', clientes:'Clientes',
+                   fiado:'Fiado' }
   document.getElementById('sectionTitle').textContent = TITLES[name] ?? name
   if      (name === 'dashboard')  await loadDashboard()
   else if (name === 'nova-venda')      renderNovaVenda()
@@ -85,6 +86,7 @@ async function showSection(name) {
   else if (name === 'produtos')   await renderProdutosAdmin()
   else if (name === 'saidas')     await initSaidas()
   else if (name === 'clientes')   await loadRelatorioClientes()
+  else if (name === 'fiado')           initFiado()
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1529,5 +1531,222 @@ window.adicionarSaida        = adicionarSaida
 window.deletarSaida          = deletarSaida
 window.loadSaidas            = loadSaidas
 window.limparFiltroSaidas    = limparFiltroSaidas
+
+// ═══════════════════════════════════════════════════════════════
+// FIADO — localStorage
+// ═══════════════════════════════════════════════════════════════
+const FDB = {
+  clientes: () => JSON.parse(localStorage.getItem('pde_clientes') || '[]'),
+  fiados:   () => JSON.parse(localStorage.getItem('pde_fiados')   || '[]'),
+  saveC: (d) => localStorage.setItem('pde_clientes', JSON.stringify(d)),
+  saveF: (d) => localStorage.setItem('pde_fiados',   JSON.stringify(d)),
+}
+const fmtR  = (v) => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL' })
+const fuid  = ()  => Date.now().toString(36) + Math.random().toString(36).slice(2,6)
+const fIni  = (n) => n.trim().split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase()
+const fData = (ts)=> new Date(ts).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})
+
+let fiadoFiltro   = 'todos'
+let fiadoInited   = false
+let fiadoPending  = null
+
+function initFiado() {
+  if (fiadoInited) { renderFiadoAll(); return }
+  fiadoInited = true
+
+  // Novo cliente
+  document.getElementById('btnNovoCliente').addEventListener('click', () => {
+    const w = document.getElementById('formClienteWrap')
+    w.style.display = w.style.display === 'none' ? 'block' : 'none'
+    if (w.style.display === 'block') document.getElementById('fNome').focus()
+  })
+  document.getElementById('btnCancelarCliente').addEventListener('click', () => {
+    document.getElementById('formClienteWrap').style.display = 'none'
+    document.getElementById('fNome').value = ''
+    document.getElementById('fTel').value  = ''
+  })
+  document.getElementById('btnSalvarCliente').addEventListener('click', () => {
+    const nome = document.getElementById('fNome').value.trim()
+    if (!nome) { document.getElementById('fNome').focus(); return }
+    const list = FDB.clientes()
+    list.push({ id: fuid(), nome, tel: document.getElementById('fTel').value.trim() })
+    FDB.saveC(list)
+    document.getElementById('fNome').value = ''
+    document.getElementById('fTel').value  = ''
+    document.getElementById('formClienteWrap').style.display = 'none'
+    renderFiadoAll()
+  })
+  document.getElementById('fNome').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('btnSalvarCliente').click()
+  })
+
+  // Delegação: deletar cliente
+  document.getElementById('fiadoClientesGrid').addEventListener('click', e => {
+    const btn = e.target.closest('[data-del-cliente]')
+    if (!btn) return
+    const cId = btn.dataset.delCliente
+    const c   = FDB.clientes().find(x => x.id === cId)
+    fiadoConfirm(`Remover "${c?.nome}"? Os lançamentos também serão excluídos.`, () => {
+      FDB.saveC(FDB.clientes().filter(x => x.id !== cId))
+      FDB.saveF(FDB.fiados().filter(f => f.clienteId !== cId))
+      renderFiadoAll()
+    })
+  })
+
+  // Novo fiado
+  document.getElementById('btnNovoFiado').addEventListener('click', () => {
+    const w = document.getElementById('formFiadoWrap')
+    w.style.display = w.style.display === 'none' ? 'block' : 'none'
+    if (w.style.display === 'block') document.getElementById('fClienteSel').focus()
+  })
+  document.getElementById('btnCancelarFiado').addEventListener('click', () => {
+    document.getElementById('formFiadoWrap').style.display  = 'none'
+    document.getElementById('fClienteSel').value = ''
+    document.getElementById('fValor').value = ''
+    document.getElementById('fDesc').value  = ''
+  })
+  document.getElementById('btnSalvarFiado').addEventListener('click', () => {
+    const clienteId = document.getElementById('fClienteSel').value
+    const valor     = parseFloat(document.getElementById('fValor').value)
+    if (!clienteId) { document.getElementById('fClienteSel').focus(); return }
+    if (!valor || valor <= 0) { document.getElementById('fValor').focus(); return }
+    const list = FDB.fiados()
+    list.push({ id: fuid(), clienteId, valor,
+      descricao: document.getElementById('fDesc').value.trim(),
+      status: 'aberto', ts: Date.now() })
+    FDB.saveF(list)
+    document.getElementById('fClienteSel').value = ''
+    document.getElementById('fValor').value = ''
+    document.getElementById('fDesc').value  = ''
+    document.getElementById('formFiadoWrap').style.display = 'none'
+    renderFiadoAll()
+  })
+
+  // Filtros
+  document.querySelectorAll('.fiado-filtro').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.fiado-filtro').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+      fiadoFiltro = btn.dataset.f
+      renderFiadoTabela()
+    })
+  })
+
+  // Delegação: pagar / deletar lançamento
+  document.getElementById('fiadoTbody').addEventListener('click', e => {
+    const btnPagar = e.target.closest('[data-pagar]')
+    const btnDel   = e.target.closest('[data-del-fiado]')
+    if (btnPagar) {
+      const fId   = btnPagar.dataset.pagar
+      const item  = FDB.fiados().find(f => f.id === fId)
+      fiadoConfirm(`Marcar como pago: ${fmtR(item?.valor || 0)}?`, () => {
+        const list = FDB.fiados()
+        list.find(f => f.id === fId).status = 'pago'
+        FDB.saveF(list)
+        renderFiadoAll()
+      })
+    }
+    if (btnDel) {
+      fiadoConfirm('Excluir este lançamento?', () => {
+        FDB.saveF(FDB.fiados().filter(f => f.id !== btnDel.dataset.delFiado))
+        renderFiadoAll()
+      })
+    }
+  })
+
+  // Modal
+  document.getElementById('fiadoModalFechar').addEventListener('click',   fiadoModalClose)
+  document.getElementById('fiadoModalCancelar').addEventListener('click',  fiadoModalClose)
+  document.getElementById('fiadoModalConfirmar').addEventListener('click', () => {
+    fiadoModalClose()
+    fiadoPending?.()
+    fiadoPending = null
+  })
+
+  renderFiadoAll()
+}
+
+function fiadoConfirm(msg, cb) {
+  document.getElementById('fiadoModalMsg').textContent = msg
+  fiadoPending = cb
+  document.getElementById('fiadoModal').style.display = 'flex'
+}
+function fiadoModalClose() {
+  document.getElementById('fiadoModal').style.display = 'none'
+  fiadoPending = null
+}
+
+function renderFiadoClientes() {
+  const clientes = FDB.clientes()
+  const fiados   = FDB.fiados()
+  const grid     = document.getElementById('fiadoClientesGrid')
+  const empty    = document.getElementById('fiadoClientesEmpty')
+  empty.style.display = clientes.length ? 'none' : 'block'
+  grid.innerHTML = clientes.map(c => {
+    const divida = fiados.filter(f => f.clienteId === c.id && f.status === 'aberto')
+                         .reduce((s,f) => s + f.valor, 0)
+    return `
+      <div class="fiado-cliente-card">
+        <div class="fiado-avatar">${fIni(c.nome)}</div>
+        <div class="fiado-cliente-info">
+          <div class="fiado-cliente-nome">${c.nome}</div>
+          <div class="fiado-cliente-tel">${c.tel || 'Sem telefone'}</div>
+        </div>
+        <span class="fiado-divida ${divida > 0 ? 'fiado-divida--open' : 'fiado-divida--ok'}">
+          ${divida > 0 ? fmtR(divida) : '✓ Quitado'}
+        </span>
+        <button class="fiado-del-btn" data-del-cliente="${c.id}" title="Remover">✕</button>
+      </div>`
+  }).join('')
+
+  // Atualiza select
+  const sel  = document.getElementById('fClienteSel')
+  const prev = sel.value
+  sel.innerHTML = '<option value="">Selecione um cliente</option>' +
+    clientes.map(c => `<option value="${c.id}">${c.nome}</option>`).join('')
+  if (prev) sel.value = prev
+}
+
+function renderFiadoTabela() {
+  const clientes = FDB.clientes()
+  const fiados   = FDB.fiados()
+    .filter(f => fiadoFiltro === 'todos' || f.status === fiadoFiltro)
+    .sort((a,b) => b.ts - a.ts)
+
+  const abertos = FDB.fiados().filter(f => f.status === 'aberto')
+  const pagos   = FDB.fiados().filter(f => f.status === 'pago')
+  document.getElementById('fTotalAberto').textContent = fmtR(abertos.reduce((s,f)=>s+f.valor,0))
+  document.getElementById('fTotalPago').textContent   = fmtR(pagos.reduce((s,f)=>s+f.valor,0))
+  document.getElementById('fTotalCount').textContent  = FDB.fiados().length
+
+  const tbody = document.getElementById('fiadoTbody')
+  if (!fiados.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Nenhum lançamento encontrado.</td></tr>'
+    return
+  }
+  tbody.innerHTML = fiados.map(f => {
+    const nome = clientes.find(c => c.id === f.clienteId)?.nome ?? 'Cliente removido'
+    const pago = f.status === 'pago'
+    return `
+      <tr class="${pago ? 'fiado-row--pago' : ''}">
+        <td><div class="fiado-td-cliente"><div class="fiado-avatar fiado-avatar--sm">${fIni(nome)}</div>${nome}</div></td>
+        <td style="color:var(--muted);font-size:.85rem">${f.descricao || '—'}</td>
+        <td style="color:var(--muted);font-size:.85rem;white-space:nowrap">${fData(f.ts)}</td>
+        <td style="font-weight:600;white-space:nowrap;${pago?'text-decoration:line-through;color:var(--muted)':''}">${fmtR(f.valor)}</td>
+        <td><span class="fiado-badge fiado-badge--${f.status}">${pago?'Pago':'Em aberto'}</span></td>
+        <td>
+          <div style="display:flex;gap:6px;justify-content:flex-end">
+            ${!pago ? `<button class="btn-secondary fiado-action-btn" data-pagar="${f.id}">✓ Pago</button>` : ''}
+            <button class="btn-secondary fiado-action-btn fiado-action-btn--del" data-del-fiado="${f.id}">✕</button>
+          </div>
+        </td>
+      </tr>`
+  }).join('')
+}
+
+function renderFiadoAll() {
+  renderFiadoClientes()
+  renderFiadoTabela()
+}
 
 init()

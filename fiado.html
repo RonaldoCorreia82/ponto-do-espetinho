@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <title>Controle de Fiado | Ponto do Espetinho</title>
+    <link rel="stylesheet" href="/src/styles/reset.css" />
+    <link rel="stylesheet" href="/src/styles/variables.css" />
+    <link rel="stylesheet" href="/src/styles/global.css" />
+    <link rel="stylesheet" href="/src/styles/fiado.css" />
+  </head>
+  <body>
+
+    <!-- HEADER INTERNO -->
+    <header class="fiado-header">
+      <div class="fiado-header__inner">
+        <a href="/" class="fiado-header__logo">
+          <img src="/logomarca.png" alt="Ponto do Espetinho" />
+        </a>
+        <div class="fiado-header__title">
+          <h1>Gestão Interna</h1>
+          <span>Clientes &amp; Fiado</span>
+        </div>
+        <a href="/" class="btn fiado-header__back">← Voltar ao Site</a>
+      </div>
+    </header>
+
+    <main class="fiado-main">
+      <div class="container">
+
+        <!-- ========== CLIENTES ========== -->
+        <section class="fiado-section" id="sec-clientes">
+          <div class="fiado-section__head">
+            <div>
+              <h2 class="fiado-section__title">👤 Clientes</h2>
+              <p class="fiado-section__sub">Gerencie os clientes cadastrados</p>
+            </div>
+            <button class="btn" id="btn-novo-cliente">+ Novo Cliente</button>
+          </div>
+
+          <!-- Formulário novo cliente (oculto) -->
+          <div class="fiado-form" id="form-cliente" hidden>
+            <h3 class="fiado-form__title">Novo Cliente</h3>
+            <div class="fiado-form__row">
+              <div class="fiado-form__field">
+                <label for="cliente-nome">Nome *</label>
+                <input type="text" id="cliente-nome" placeholder="Nome do cliente" autocomplete="off" />
+              </div>
+              <div class="fiado-form__field">
+                <label for="cliente-tel">Telefone</label>
+                <input type="tel" id="cliente-tel" placeholder="(75) 99999-9999" autocomplete="off" />
+              </div>
+            </div>
+            <div class="fiado-form__actions">
+              <button class="btn" id="btn-salvar-cliente">Salvar Cliente</button>
+              <button class="btn btn--ghost" id="btn-cancelar-cliente">Cancelar</button>
+            </div>
+          </div>
+
+          <!-- Lista de clientes -->
+          <div class="clientes-grid" id="clientes-grid">
+            <!-- renderizado via JS -->
+          </div>
+          <p class="fiado-empty" id="clientes-empty" hidden>Nenhum cliente cadastrado ainda.</p>
+        </section>
+
+        <!-- ========== FIADO ========== -->
+        <section class="fiado-section" id="sec-fiado">
+          <div class="fiado-section__head">
+            <div>
+              <h2 class="fiado-section__title">📋 Controle de Fiado</h2>
+              <p class="fiado-section__sub">Registre e acompanhe as dívidas</p>
+            </div>
+            <button class="btn" id="btn-novo-fiado">+ Lançar Fiado</button>
+          </div>
+
+          <!-- Formulário novo fiado (oculto) -->
+          <div class="fiado-form" id="form-fiado" hidden>
+            <h3 class="fiado-form__title">Lançar Fiado</h3>
+            <div class="fiado-form__row">
+              <div class="fiado-form__field">
+                <label for="fiado-cliente">Cliente *</label>
+                <select id="fiado-cliente">
+                  <option value="">Selecione um cliente</option>
+                </select>
+              </div>
+              <div class="fiado-form__field">
+                <label for="fiado-valor">Valor (R$) *</label>
+                <input type="number" id="fiado-valor" placeholder="0,00" min="0.01" step="0.01" />
+              </div>
+            </div>
+            <div class="fiado-form__row">
+              <div class="fiado-form__field fiado-form__field--full">
+                <label for="fiado-descricao">Descrição</label>
+                <input type="text" id="fiado-descricao" placeholder="Ex: 2x Picanha, 1x Heineken" autocomplete="off" />
+              </div>
+            </div>
+            <div class="fiado-form__actions">
+              <button class="btn" id="btn-salvar-fiado">Lançar</button>
+              <button class="btn btn--ghost" id="btn-cancelar-fiado">Cancelar</button>
+            </div>
+          </div>
+
+          <!-- Filtros -->
+          <div class="fiado-filtros">
+            <button class="filtro-btn active" data-filtro="todos">Todos</button>
+            <button class="filtro-btn" data-filtro="aberto">Em aberto</button>
+            <button class="filtro-btn" data-filtro="pago">Pagos</button>
+          </div>
+
+          <!-- Resumo -->
+          <div class="fiado-resumo">
+            <div class="resumo-card resumo-card--total">
+              <span class="resumo-card__label">Total em Aberto</span>
+              <span class="resumo-card__valor" id="total-aberto">R$ 0,00</span>
+            </div>
+            <div class="resumo-card resumo-card--pago">
+              <span class="resumo-card__label">Total Recebido</span>
+              <span class="resumo-card__valor" id="total-pago">R$ 0,00</span>
+            </div>
+            <div class="resumo-card resumo-card--count">
+              <span class="resumo-card__label">Lançamentos</span>
+              <span class="resumo-card__valor" id="total-count">0</span>
+            </div>
+          </div>
+
+          <!-- Lista de fiado -->
+          <div class="fiado-lista" id="fiado-lista">
+            <!-- renderizado via JS -->
+          </div>
+          <p class="fiado-empty" id="fiado-empty" hidden>Nenhum lançamento encontrado.</p>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- MODAL DE CONFIRMAÇÃO -->
+    <div class="modal-overlay" id="modal-overlay" hidden>
+      <div class="modal">
+        <p class="modal__msg" id="modal-msg">Tem certeza?</p>
+        <div class="modal__actions">
+          <button class="btn" id="modal-confirmar">Confirmar</button>
+          <button class="btn btn--ghost" id="modal-cancelar">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/js/fiado.js"></script>
+  </body>
+</html>
