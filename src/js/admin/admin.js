@@ -1682,8 +1682,6 @@ function fiadoModalClose() {
 
 async function renderFiadoClientes() {
   const { data: clientes } = await supabase.from('clientes_fiado').select('*')
-  const { data: abFiados  } = await supabase.from('fiados')
-    .select('cliente_id, valor').eq('status', 'aberto')
 
   const grid  = document.getElementById('fiadoClientesGrid')
   const empty = document.getElementById('fiadoClientesEmpty')
@@ -1691,23 +1689,15 @@ async function renderFiadoClientes() {
     a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }))
 
   empty.style.display = list.length ? 'none' : 'block'
-  grid.innerHTML = list.map(c => {
-    const divida = (abFiados || [])
-      .filter(f => f.cliente_id === c.id)
-      .reduce((s, f) => s + Number(f.valor), 0)
-    return `
+  grid.innerHTML = list.map(c => `
       <div class="fiado-cliente-card">
         <div class="fiado-avatar">${fIni(c.nome)}</div>
         <div class="fiado-cliente-info">
           <div class="fiado-cliente-nome">${c.nome}</div>
           <div class="fiado-cliente-tel">${c.tel || 'Sem telefone'}</div>
         </div>
-        <span class="fiado-divida ${divida > 0 ? 'fiado-divida--open' : 'fiado-divida--ok'}">
-          ${divida > 0 ? fmtR(divida) : '✓ Quitado'}
-        </span>
         <button class="fiado-del-btn" data-del-cliente="${c.id}" title="Remover">✕</button>
-      </div>`
-  }).join('')
+      </div>`).join('')
 
   // Atualiza select
   const sel  = document.getElementById('fClienteSel')
@@ -1720,7 +1710,6 @@ async function renderFiadoClientes() {
 async function renderFiadoTabela() {
   const { data: all } = await supabase.from('fiados')
     .select('*, clientes_fiado(nome)')
-    .order('criado_em', { ascending: false })
 
   const fiados  = all || []
   const abertos = fiados.filter(f => f.status === 'aberto')
@@ -1733,6 +1722,8 @@ async function renderFiadoTabela() {
   let rows = fiadoFiltro === 'todos' ? fiados : fiados.filter(f => f.status === fiadoFiltro)
   if (fiadoBusca)
     rows = rows.filter(f => (f.clientes_fiado?.nome ?? '').toLowerCase().includes(fiadoBusca))
+  rows.sort((a, b) =>
+    (a.clientes_fiado?.nome ?? '').localeCompare(b.clientes_fiado?.nome ?? '', 'pt-BR', { sensitivity: 'base' }))
   const tbody = document.getElementById('fiadoTbody')
 
   if (!rows.length) {
