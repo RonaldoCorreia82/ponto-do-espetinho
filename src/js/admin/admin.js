@@ -1655,9 +1655,9 @@ async function initFiado() {
   document.getElementById('fiadoModalFechar').addEventListener('click',   fiadoModalClose)
   document.getElementById('fiadoModalCancelar').addEventListener('click',  fiadoModalClose)
   document.getElementById('fiadoModalConfirmar').addEventListener('click', () => {
+    const cb = fiadoPending
     fiadoModalClose()
-    fiadoPending?.()
-    fiadoPending = null
+    cb?.()
   })
 
   await renderFiadoAll()
