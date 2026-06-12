@@ -1681,13 +1681,14 @@ function fiadoModalClose() {
 }
 
 async function renderFiadoClientes() {
-  const { data: clientes } = await supabase.from('clientes_fiado').select('*').order('nome')
+  const { data: clientes } = await supabase.from('clientes_fiado').select('*')
   const { data: abFiados  } = await supabase.from('fiados')
     .select('cliente_id, valor').eq('status', 'aberto')
 
   const grid  = document.getElementById('fiadoClientesGrid')
   const empty = document.getElementById('fiadoClientesEmpty')
-  const list  = clientes || []
+  const list  = (clientes || []).sort((a, b) =>
+    a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }))
 
   empty.style.display = list.length ? 'none' : 'block'
   grid.innerHTML = list.map(c => {
