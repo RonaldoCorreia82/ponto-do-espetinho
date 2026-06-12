@@ -1532,6 +1532,9 @@ window.deletarSaida          = deletarSaida
 window.loadSaidas            = loadSaidas
 window.limparFiltroSaidas    = limparFiltroSaidas
 window.fiadoIrPagina         = (p) => { fiadoPage = p; renderFiadoTabela() }
+window.fiadoAbrirEdit        = fiadoAbrirEdit
+window.fiadoEditSalvar       = fiadoEditSalvar
+window.fiadoEditClose        = fiadoEditClose
 
 // ═══════════════════════════════════════════════════════════════
 // FIADO — Supabase
@@ -1541,11 +1544,12 @@ const fIni  = (n) => n.trim().split(' ').slice(0,2).map(p=>p[0]).join('').toUppe
 const fData = (ts)=> new Date(ts).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})
 
 const FIADO_PER_PAGE = 20
-let fiadoFiltro  = 'todos'
-let fiadoBusca   = ''
-let fiadoPage    = 1
-let fiadoInited  = false
-let fiadoPending = null
+let fiadoFiltro    = 'todos'
+let fiadoBusca     = ''
+let fiadoPage      = 1
+let fiadoInited    = false
+let fiadoPending   = null
+let fiadoEditandoId = null
 
 async function initFiado() {
   if (fiadoInited) { await renderFiadoAll(); return }
@@ -1627,10 +1631,12 @@ async function initFiado() {
     await renderFiadoTabela()
   })
 
-  // Delegação: pagar / deletar lançamento
+  // Delegação: editar / pagar / deletar lançamento
   document.getElementById('fiadoTbody').addEventListener('click', e => {
+    const btnEdit  = e.target.closest('[data-editar]')
     const btnPagar = e.target.closest('[data-pagar]')
     const btnDel   = e.target.closest('[data-del-fiado]')
+    if (btnEdit) { fiadoAbrirEdit(btnEdit.dataset.editar); return }
     if (btnPagar) {
       const fId    = btnPagar.dataset.pagar
       const valTxt = btnPagar.closest('tr')?.querySelector('td:nth-child(4)')?.textContent?.trim() || ''
@@ -1651,7 +1657,7 @@ async function initFiado() {
     }
   })
 
-  // Modal
+  // Modal confirmação
   document.getElementById('fiadoModalFechar').addEventListener('click',   fiadoModalClose)
   document.getElementById('fiadoModalCancelar').addEventListener('click',  fiadoModalClose)
   document.getElementById('fiadoModalConfirmar').addEventListener('click', () => {
@@ -1659,6 +1665,11 @@ async function initFiado() {
     fiadoModalClose()
     cb?.()
   })
+
+  // Modal edição
+  document.getElementById('fiadoEditFechar').addEventListener('click',   fiadoEditClose)
+  document.getElementById('fiadoEditCancelar').addEventListener('click',  fiadoEditClose)
+  document.getElementById('fiadoEditSalvar').addEventListener('click',    fiadoEditSalvar)
 
   await renderFiadoAll()
 }
@@ -1726,7 +1737,8 @@ async function renderFiadoTabela() {
         <td>
           <div style="display:flex;gap:6px;justify-content:flex-end">
             ${!pago ? `<button class="btn-secondary fiado-action-btn" data-pagar="${f.id}">✓ Pago</button>` : ''}
-            <button class="btn-secondary fiado-action-btn fiado-action-btn--del" data-del-fiado="${f.id}">✕</button>
+            <button class="btn-secondary fiado-action-btn" data-editar="${f.id}" title="Editar">✏</button>
+            <button class="btn-secondary fiado-action-btn fiado-action-btn--del" data-del-fiado="${f.id}" title="Excluir">✕</button>
           </div>
         </td>
       </tr>`
@@ -1750,6 +1762,63 @@ async function renderFiadoTabela() {
 
 async function renderFiadoAll() {
   await Promise.all([renderFiadoClientes(), renderFiadoTabela()])
+}
+
+async function fiadoAbrirEdit(id) {
+  const { data: f, error } = await supabase.from('fiados').select('*').eq('id', id).single()
+  if (error || !f) { showToast('Erro ao carregar lançamento.', 'error'); return }
+
+  fiadoEditandoId = id
+
+  // Preenche o select de clientes
+  const { data: clientes } = await supabase.from('clientes_fiado').select('*')
+  const list = (clientes || []).sort((a, b) =>
+    a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }))
+  const sel = document.getElementById('feCliente')
+  sel.innerHTML = list.map(c =>
+    `<option value="${c.id}" ${c.id === f.cliente_id ? 'selected' : ''}>${c.nome}</option>`
+  ).join('')
+
+  document.getElementById('feValor').value  = f.valor
+  document.getElementById('feDesc').value   = f.descricao || ''
+  document.getElementById('feStatus').value = f.status
+
+  document.getElementById('fiadoEditModal').style.display = 'flex'
+}
+
+function fiadoEditClose() {
+  document.getElementById('fiadoEditModal').style.display = 'none'
+  fiadoEditandoId = null
+}
+
+async function fiadoEditSalvar() {
+  if (!fiadoEditandoId) return
+  const btn = document.getElementById('fiadoEditSalvar')
+  btn.disabled = true; btn.textContent = 'Salvando…'
+
+  const cliente_id = document.getElementById('feCliente').value
+  const valor      = parseFloat(document.getElementById('feValor').value)
+  const descricao  = document.getElementById('feDesc').value.trim() || null
+  const status     = document.getElementById('feStatus').value
+
+  if (!valor || valor <= 0) {
+    showToast('Informe um valor válido.', 'error')
+    btn.disabled = false; btn.textContent = 'Salvar'
+    return
+  }
+
+  const patch = { cliente_id, valor, descricao, status }
+  if (status === 'pago') patch.pago_em = patch.pago_em ?? new Date().toISOString()
+  else patch.pago_em = null
+
+  const { error } = await supabase.from('fiados').update(patch).eq('id', fiadoEditandoId)
+  btn.disabled = false; btn.textContent = 'Salvar'
+
+  if (error) { showToast('Erro ao salvar.', 'error'); return }
+
+  fiadoEditClose()
+  showToast('Lançamento atualizado!', 'success')
+  await renderFiadoAll()
 }
 
 init()

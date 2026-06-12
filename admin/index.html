@@ -539,6 +539,41 @@
           </div>
         </div>
 
+        <!-- Modal editar fiado -->
+        <div id="fiadoEditModal" class="modal-overlay" role="dialog" style="display:none">
+          <div class="modal-card" style="max-width:420px;width:100%">
+            <div class="modal-header">
+              <h2 class="modal-title">Editar Lançamento</h2>
+              <button class="modal-close" type="button" id="fiadoEditFechar">✕</button>
+            </div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+              <div class="field">
+                <label class="field-label" for="feCliente">Cliente</label>
+                <select id="feCliente" class="field-input field-select"></select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="feValor">Valor (R$)</label>
+                <input type="number" id="feValor" class="field-input" min="0.01" step="0.01" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="feDesc">Descrição</label>
+                <input type="text" id="feDesc" class="field-input" placeholder="Ex: 2x Picanha" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="feStatus">Status</label>
+                <select id="feStatus" class="field-input field-select">
+                  <option value="aberto">Em aberto</option>
+                  <option value="pago">Pago</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn-secondary" type="button" id="fiadoEditCancelar">Cancelar</button>
+              <button class="btn-primary"   type="button" id="fiadoEditSalvar">Salvar</button>
+            </div>
+          </div>
+        </div>
+
       </section>
 
     </div><!-- /admin-content -->
