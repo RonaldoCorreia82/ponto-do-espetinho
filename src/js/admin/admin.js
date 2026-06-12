@@ -86,7 +86,7 @@ async function showSection(name) {
   else if (name === 'produtos')   await renderProdutosAdmin()
   else if (name === 'saidas')     await initSaidas()
   else if (name === 'clientes')   await loadRelatorioClientes()
-  else if (name === 'fiado')           initFiado()
+  else if (name === 'fiado')      await initFiado()
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1533,25 +1533,18 @@ window.loadSaidas            = loadSaidas
 window.limparFiltroSaidas    = limparFiltroSaidas
 
 // ═══════════════════════════════════════════════════════════════
-// FIADO — localStorage
+// FIADO — Supabase
 // ═══════════════════════════════════════════════════════════════
-const FDB = {
-  clientes: () => JSON.parse(localStorage.getItem('pde_clientes') || '[]'),
-  fiados:   () => JSON.parse(localStorage.getItem('pde_fiados')   || '[]'),
-  saveC: (d) => localStorage.setItem('pde_clientes', JSON.stringify(d)),
-  saveF: (d) => localStorage.setItem('pde_fiados',   JSON.stringify(d)),
-}
-const fmtR  = (v) => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL' })
-const fuid  = ()  => Date.now().toString(36) + Math.random().toString(36).slice(2,6)
+const fmtR  = (v) => Number(v).toLocaleString('pt-BR', { style:'currency', currency:'BRL' })
 const fIni  = (n) => n.trim().split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase()
 const fData = (ts)=> new Date(ts).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})
 
-let fiadoFiltro   = 'todos'
-let fiadoInited   = false
-let fiadoPending  = null
+let fiadoFiltro  = 'todos'
+let fiadoInited  = false
+let fiadoPending = null
 
-function initFiado() {
-  if (fiadoInited) { renderFiadoAll(); return }
+async function initFiado() {
+  if (fiadoInited) { await renderFiadoAll(); return }
   fiadoInited = true
 
   // Novo cliente
@@ -1565,16 +1558,16 @@ function initFiado() {
     document.getElementById('fNome').value = ''
     document.getElementById('fTel').value  = ''
   })
-  document.getElementById('btnSalvarCliente').addEventListener('click', () => {
+  document.getElementById('btnSalvarCliente').addEventListener('click', async () => {
     const nome = document.getElementById('fNome').value.trim()
     if (!nome) { document.getElementById('fNome').focus(); return }
-    const list = FDB.clientes()
-    list.push({ id: fuid(), nome, tel: document.getElementById('fTel').value.trim() })
-    FDB.saveC(list)
+    const { error } = await supabase.from('clientes_fiado')
+      .insert({ nome, tel: document.getElementById('fTel').value.trim() || null })
+    if (error) { showToast('Erro ao salvar cliente.', 'error'); return }
     document.getElementById('fNome').value = ''
     document.getElementById('fTel').value  = ''
     document.getElementById('formClienteWrap').style.display = 'none'
-    renderFiadoAll()
+    await renderFiadoAll()
   })
   document.getElementById('fNome').addEventListener('keydown', e => {
     if (e.key === 'Enter') document.getElementById('btnSalvarCliente').click()
@@ -1584,12 +1577,12 @@ function initFiado() {
   document.getElementById('fiadoClientesGrid').addEventListener('click', e => {
     const btn = e.target.closest('[data-del-cliente]')
     if (!btn) return
-    const cId = btn.dataset.delCliente
-    const c   = FDB.clientes().find(x => x.id === cId)
-    fiadoConfirm(`Remover "${c?.nome}"? Os lançamentos também serão excluídos.`, () => {
-      FDB.saveC(FDB.clientes().filter(x => x.id !== cId))
-      FDB.saveF(FDB.fiados().filter(f => f.clienteId !== cId))
-      renderFiadoAll()
+    const cId   = btn.dataset.delCliente
+    const cNome = btn.closest('.fiado-cliente-card')?.querySelector('.fiado-cliente-nome')?.textContent || ''
+    fiadoConfirm(`Remover "${cNome}"? Os lançamentos também serão excluídos.`, async () => {
+      const { error } = await supabase.from('clientes_fiado').delete().eq('id', cId)
+      if (error) { showToast('Erro ao remover cliente.', 'error'); return }
+      await renderFiadoAll()
     })
   })
 
@@ -1605,30 +1598,32 @@ function initFiado() {
     document.getElementById('fValor').value = ''
     document.getElementById('fDesc').value  = ''
   })
-  document.getElementById('btnSalvarFiado').addEventListener('click', () => {
-    const clienteId = document.getElementById('fClienteSel').value
-    const valor     = parseFloat(document.getElementById('fValor').value)
-    if (!clienteId) { document.getElementById('fClienteSel').focus(); return }
+  document.getElementById('btnSalvarFiado').addEventListener('click', async () => {
+    const cliente_id = document.getElementById('fClienteSel').value
+    const valor      = parseFloat(document.getElementById('fValor').value)
+    if (!cliente_id) { document.getElementById('fClienteSel').focus(); return }
     if (!valor || valor <= 0) { document.getElementById('fValor').focus(); return }
-    const list = FDB.fiados()
-    list.push({ id: fuid(), clienteId, valor,
-      descricao: document.getElementById('fDesc').value.trim(),
-      status: 'aberto', ts: Date.now() })
-    FDB.saveF(list)
+    const { error } = await supabase.from('fiados').insert({
+      cliente_id,
+      valor,
+      descricao: document.getElementById('fDesc').value.trim() || null,
+      status: 'aberto',
+    })
+    if (error) { showToast('Erro ao salvar lançamento.', 'error'); return }
     document.getElementById('fClienteSel').value = ''
     document.getElementById('fValor').value = ''
     document.getElementById('fDesc').value  = ''
     document.getElementById('formFiadoWrap').style.display = 'none'
-    renderFiadoAll()
+    await renderFiadoAll()
   })
 
   // Filtros
   document.querySelectorAll('.fiado-filtro').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       document.querySelectorAll('.fiado-filtro').forEach(b => b.classList.remove('active'))
       btn.classList.add('active')
       fiadoFiltro = btn.dataset.f
-      renderFiadoTabela()
+      await renderFiadoTabela()
     })
   })
 
@@ -1637,19 +1632,21 @@ function initFiado() {
     const btnPagar = e.target.closest('[data-pagar]')
     const btnDel   = e.target.closest('[data-del-fiado]')
     if (btnPagar) {
-      const fId   = btnPagar.dataset.pagar
-      const item  = FDB.fiados().find(f => f.id === fId)
-      fiadoConfirm(`Marcar como pago: ${fmtR(item?.valor || 0)}?`, () => {
-        const list = FDB.fiados()
-        list.find(f => f.id === fId).status = 'pago'
-        FDB.saveF(list)
-        renderFiadoAll()
+      const fId    = btnPagar.dataset.pagar
+      const valTxt = btnPagar.closest('tr')?.querySelector('td:nth-child(4)')?.textContent?.trim() || ''
+      fiadoConfirm(`Marcar como pago: ${valTxt}?`, async () => {
+        const { error } = await supabase.from('fiados')
+          .update({ status: 'pago', pago_em: new Date().toISOString() })
+          .eq('id', fId)
+        if (error) { showToast('Erro ao atualizar.', 'error'); return }
+        await renderFiadoAll()
       })
     }
     if (btnDel) {
-      fiadoConfirm('Excluir este lançamento?', () => {
-        FDB.saveF(FDB.fiados().filter(f => f.id !== btnDel.dataset.delFiado))
-        renderFiadoAll()
+      fiadoConfirm('Excluir este lançamento?', async () => {
+        const { error } = await supabase.from('fiados').delete().eq('id', btnDel.dataset.delFiado)
+        if (error) { showToast('Erro ao excluir.', 'error'); return }
+        await renderFiadoAll()
       })
     }
   })
@@ -1663,7 +1660,7 @@ function initFiado() {
     fiadoPending = null
   })
 
-  renderFiadoAll()
+  await renderFiadoAll()
 }
 
 function fiadoConfirm(msg, cb) {
@@ -1676,15 +1673,20 @@ function fiadoModalClose() {
   fiadoPending = null
 }
 
-function renderFiadoClientes() {
-  const clientes = FDB.clientes()
-  const fiados   = FDB.fiados()
-  const grid     = document.getElementById('fiadoClientesGrid')
-  const empty    = document.getElementById('fiadoClientesEmpty')
-  empty.style.display = clientes.length ? 'none' : 'block'
-  grid.innerHTML = clientes.map(c => {
-    const divida = fiados.filter(f => f.clienteId === c.id && f.status === 'aberto')
-                         .reduce((s,f) => s + f.valor, 0)
+async function renderFiadoClientes() {
+  const { data: clientes } = await supabase.from('clientes_fiado').select('*').order('nome')
+  const { data: abFiados  } = await supabase.from('fiados')
+    .select('cliente_id, valor').eq('status', 'aberto')
+
+  const grid  = document.getElementById('fiadoClientesGrid')
+  const empty = document.getElementById('fiadoClientesEmpty')
+  const list  = clientes || []
+
+  empty.style.display = list.length ? 'none' : 'block'
+  grid.innerHTML = list.map(c => {
+    const divida = (abFiados || [])
+      .filter(f => f.cliente_id === c.id)
+      .reduce((s, f) => s + Number(f.valor), 0)
     return `
       <div class="fiado-cliente-card">
         <div class="fiado-avatar">${fIni(c.nome)}</div>
@@ -1703,35 +1705,38 @@ function renderFiadoClientes() {
   const sel  = document.getElementById('fClienteSel')
   const prev = sel.value
   sel.innerHTML = '<option value="">Selecione um cliente</option>' +
-    clientes.map(c => `<option value="${c.id}">${c.nome}</option>`).join('')
+    list.map(c => `<option value="${c.id}">${c.nome}</option>`).join('')
   if (prev) sel.value = prev
 }
 
-function renderFiadoTabela() {
-  const clientes = FDB.clientes()
-  const fiados   = FDB.fiados()
-    .filter(f => fiadoFiltro === 'todos' || f.status === fiadoFiltro)
-    .sort((a,b) => b.ts - a.ts)
+async function renderFiadoTabela() {
+  const { data: all } = await supabase.from('fiados')
+    .select('*, clientes_fiado(nome)')
+    .order('criado_em', { ascending: false })
 
-  const abertos = FDB.fiados().filter(f => f.status === 'aberto')
-  const pagos   = FDB.fiados().filter(f => f.status === 'pago')
-  document.getElementById('fTotalAberto').textContent = fmtR(abertos.reduce((s,f)=>s+f.valor,0))
-  document.getElementById('fTotalPago').textContent   = fmtR(pagos.reduce((s,f)=>s+f.valor,0))
-  document.getElementById('fTotalCount').textContent  = FDB.fiados().length
+  const fiados  = all || []
+  const abertos = fiados.filter(f => f.status === 'aberto')
+  const pagos   = fiados.filter(f => f.status === 'pago')
 
+  document.getElementById('fTotalAberto').textContent = fmtR(abertos.reduce((s,f) => s + Number(f.valor), 0))
+  document.getElementById('fTotalPago').textContent   = fmtR(pagos.reduce((s,f) => s + Number(f.valor), 0))
+  document.getElementById('fTotalCount').textContent  = fiados.length
+
+  const rows  = fiadoFiltro === 'todos' ? fiados : fiados.filter(f => f.status === fiadoFiltro)
   const tbody = document.getElementById('fiadoTbody')
-  if (!fiados.length) {
+
+  if (!rows.length) {
     tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Nenhum lançamento encontrado.</td></tr>'
     return
   }
-  tbody.innerHTML = fiados.map(f => {
-    const nome = clientes.find(c => c.id === f.clienteId)?.nome ?? 'Cliente removido'
+  tbody.innerHTML = rows.map(f => {
+    const nome = f.clientes_fiado?.nome ?? 'Cliente removido'
     const pago = f.status === 'pago'
     return `
       <tr class="${pago ? 'fiado-row--pago' : ''}">
         <td><div class="fiado-td-cliente"><div class="fiado-avatar fiado-avatar--sm">${fIni(nome)}</div>${nome}</div></td>
         <td style="color:var(--muted);font-size:.85rem">${f.descricao || '—'}</td>
-        <td style="color:var(--muted);font-size:.85rem;white-space:nowrap">${fData(f.ts)}</td>
+        <td style="color:var(--muted);font-size:.85rem;white-space:nowrap">${fData(f.criado_em)}</td>
         <td style="font-weight:600;white-space:nowrap;${pago?'text-decoration:line-through;color:var(--muted)':''}">${fmtR(f.valor)}</td>
         <td><span class="fiado-badge fiado-badge--${f.status}">${pago?'Pago':'Em aberto'}</span></td>
         <td>
@@ -1744,9 +1749,8 @@ function renderFiadoTabela() {
   }).join('')
 }
 
-function renderFiadoAll() {
-  renderFiadoClientes()
-  renderFiadoTabela()
+async function renderFiadoAll() {
+  await Promise.all([renderFiadoClientes(), renderFiadoTabela()])
 }
 
 init()
