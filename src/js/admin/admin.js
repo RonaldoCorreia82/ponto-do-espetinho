@@ -758,15 +758,15 @@ async function loadRelatorio() {
     untilISO  = null
   }
 
-  const addUntil = (q) => untilISO ? q.lt('criado_em', untilISO) : q
-
   const [rVendas, rItens] = await Promise.all([
-    addUntil(supabase.from('vendas')
+    supabase.from('vendas')
       .select('total, criado_em, pago_dinheiro, pago_pix')
-      .gte('criado_em', sinceISO)),
-    addUntil(supabase.from('venda_itens')
+      .gte('criado_em', sinceISO)
+      .lt ('criado_em', untilISO ?? '2999-01-01'),
+    supabase.from('venda_itens')
       .select('produto_nome, quantidade, subtotal, vendas!inner(criado_em)')
-      .gte('vendas.criado_em', sinceISO)),
+      .gte('vendas.criado_em', sinceISO)
+      .lt ('vendas.criado_em', untilISO ?? '2999-01-01'),
   ])
 
   const vendas = rVendas.data || []
