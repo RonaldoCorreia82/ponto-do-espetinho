@@ -349,8 +349,15 @@
             <h2 class="card-title" style="margin-bottom:0">Relatório de Vendas</h2>
             <div class="field-row">
               <div class="field">
+                <label class="field-label" for="filtroRelData">Data</label>
+                <input type="date" id="filtroRelData" class="field-input"
+                  style="width:auto" onchange="loadRelatorio()" />
+              </div>
+              <div class="field">
                 <label class="field-label" for="filtroPeriodo">Período</label>
-                <select id="filtroPeriodo" class="field-input field-select" style="width:auto">
+                <select id="filtroPeriodo" class="field-input field-select" style="width:auto"
+                  onchange="loadRelatorio()">
+                  <option value="0">Hoje</option>
                   <option value="7">Últimos 7 dias</option>
                   <option value="15">Últimos 15 dias</option>
                   <option value="30">Últimos 30 dias</option>

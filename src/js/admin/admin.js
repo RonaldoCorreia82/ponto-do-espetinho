@@ -730,19 +730,43 @@ async function loadRelatorio() {
   if (!container) return
   container.innerHTML = '<div class="loading-row">Calculando…</div>'
 
-  const dias     = Number(document.getElementById('filtroPeriodo')?.value ?? 7)
-  const since    = new Date()
-  since.setDate(since.getDate() - dias)
-  const sinceISO = since.toISOString()
-  const fmt = n => `R$ ${n.toFixed(2).replace('.', ',')}`
+  const fmt       = n => `R$ ${n.toFixed(2).replace('.', ',')}`
+  const dataManual = document.getElementById('filtroRelData')?.value  // "YYYY-MM-DD"
+  const dias       = Number(document.getElementById('filtroPeriodo')?.value ?? 0)
+
+  let sinceISO, untilISO
+
+  if (dataManual) {
+    // Data específica escolhida manualmente
+    // Bahia = UTC-3: meia-noite local = 03:00 UTC
+    sinceISO = `${dataManual}T03:00:00.000Z`
+    const nextDay = new Date(dataManual + 'T03:00:00.000Z')
+    nextDay.setUTCDate(nextDay.getUTCDate() + 1)
+    untilISO = nextDay.toISOString()
+  } else if (dias === 0) {
+    // "Hoje" — dia atual em Salvador
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: TZ })
+    sinceISO = `${today}T03:00:00.000Z`
+    const nextDay = new Date(today + 'T03:00:00.000Z')
+    nextDay.setUTCDate(nextDay.getUTCDate() + 1)
+    untilISO = nextDay.toISOString()
+  } else {
+    // Últimos N dias
+    const since = new Date()
+    since.setDate(since.getDate() - dias)
+    sinceISO = since.toISOString()
+    untilISO  = null
+  }
+
+  const addUntil = (q) => untilISO ? q.lt('criado_em', untilISO) : q
 
   const [rVendas, rItens] = await Promise.all([
-    supabase.from('vendas')
+    addUntil(supabase.from('vendas')
       .select('total, criado_em, pago_dinheiro, pago_pix')
-      .gte('criado_em', sinceISO),
-    supabase.from('venda_itens')
+      .gte('criado_em', sinceISO)),
+    addUntil(supabase.from('venda_itens')
       .select('produto_nome, quantidade, subtotal, vendas!inner(criado_em)')
-      .gte('vendas.criado_em', sinceISO),
+      .gte('vendas.criado_em', sinceISO)),
   ])
 
   const vendas = rVendas.data || []
