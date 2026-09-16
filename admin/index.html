@@ -349,8 +349,13 @@
             <h2 class="card-title" style="margin-bottom:0">Relatório de Vendas</h2>
             <div class="field-row">
               <div class="field">
-                <label class="field-label" for="filtroRelData">Data</label>
-                <input type="date" id="filtroRelData" class="field-input"
+                <label class="field-label" for="filtroDataInicial">Data inicial</label>
+                <input type="date" id="filtroDataInicial" class="field-input"
+                  style="width:auto" onchange="loadRelatorio()" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="filtroDataFinal">Data final</label>
+                <input type="date" id="filtroDataFinal" class="field-input"
                   style="width:auto" onchange="loadRelatorio()" />
               </div>
               <div class="field">
@@ -382,6 +387,16 @@
           <div class="relatorio-header">
             <h2 class="card-title" style="margin-bottom:0">👥 Clientes</h2>
             <div class="field-row">
+              <div class="field">
+                <label class="field-label" for="clienteDataInicial">Data inicial</label>
+                <input type="date" id="clienteDataInicial" class="field-input"
+                  style="width:auto" onchange="loadRelatorioClientes()" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="clienteDataFinal">Data final</label>
+                <input type="date" id="clienteDataFinal" class="field-input"
+                  style="width:auto" onchange="loadRelatorioClientes()" />
+              </div>
               <div class="field">
                 <label class="field-label" for="clientePeriodo">Período</label>
                 <select id="clientePeriodo" class="field-input field-select" style="width:auto"

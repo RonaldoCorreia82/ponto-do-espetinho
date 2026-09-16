@@ -730,19 +730,25 @@ async function loadRelatorio() {
   if (!container) return
   container.innerHTML = '<div class="loading-row">Calculando…</div>'
 
-  const fmt       = n => `R$ ${n.toFixed(2).replace('.', ',')}`
-  const dataManual = document.getElementById('filtroRelData')?.value  // "YYYY-MM-DD"
-  const dias       = Number(document.getElementById('filtroPeriodo')?.value ?? 0)
+  const fmt         = n => `R$ ${n.toFixed(2).replace('.', ',')}`
+  const dataInicial = document.getElementById('filtroDataInicial')?.value  // "YYYY-MM-DD"
+  const dataFinal   = document.getElementById('filtroDataFinal')?.value    // "YYYY-MM-DD"
+  const dias        = Number(document.getElementById('filtroPeriodo')?.value ?? 0)
+
+  // Bahia = UTC-3: meia-noite local = 03:00 UTC
+  const fimDoDia = d => {
+    const next = new Date(`${d}T03:00:00.000Z`)
+    next.setUTCDate(next.getUTCDate() + 1)
+    return next.toISOString()
+  }
 
   let sinceISO, untilISO
 
-  if (dataManual) {
-    // Data específica escolhida manualmente
-    // Bahia = UTC-3: meia-noite local = 03:00 UTC
-    sinceISO = `${dataManual}T03:00:00.000Z`
-    const nextDay = new Date(dataManual + 'T03:00:00.000Z')
-    nextDay.setUTCDate(nextDay.getUTCDate() + 1)
-    untilISO = nextDay.toISOString()
+  if (dataInicial || dataFinal) {
+    // Intervalo por data inicial / data final (tem prioridade sobre o período)
+    // Só inicial → daquela data até agora | só final → do começo até aquela data
+    sinceISO = dataInicial ? `${dataInicial}T03:00:00.000Z` : '2000-01-01T03:00:00.000Z'
+    untilISO = dataFinal ? fimDoDia(dataFinal) : null
   } else if (dias === 0) {
     // "Hoje" — dia atual em Salvador
     const today = new Date().toLocaleDateString('en-CA', { timeZone: TZ })
@@ -864,16 +870,29 @@ async function loadRelatorioClientes() {
   if (!container) return
   container.innerHTML = '<div class="loading-row">Calculando…</div>'
 
-  const busca = document.getElementById('clienteBusca')?.value.trim().toLowerCase() || ''
-  const dias  = Number(document.getElementById('clientePeriodo')?.value ?? 0)
+  const busca       = document.getElementById('clienteBusca')?.value.trim().toLowerCase() || ''
+  const dias        = Number(document.getElementById('clientePeriodo')?.value ?? 0)
+  const dataInicial = document.getElementById('clienteDataInicial')?.value  // "YYYY-MM-DD"
+  const dataFinal   = document.getElementById('clienteDataFinal')?.value    // "YYYY-MM-DD"
   const fmt   = n => `R$ ${Number(n).toFixed(2).replace('.', ',')}`
+
+  // Bahia = UTC-3: meia-noite local = 03:00 UTC
+  const fimDoDia = d => {
+    const next = new Date(`${d}T03:00:00.000Z`)
+    next.setUTCDate(next.getUTCDate() + 1)
+    return next.toISOString()
+  }
 
   let q = supabase
     .from('vendas')
     .select('id, criado_em, total, cliente_nome, pago_dinheiro, pago_pix, venda_itens(produto_nome, quantidade, subtotal)')
     .order('criado_em', { ascending: false })
 
-  if (dias > 0) {
+  if (dataInicial || dataFinal) {
+    // Intervalo por data inicial / data final (tem prioridade sobre o período)
+    if (dataInicial) q = q.gte('criado_em', `${dataInicial}T03:00:00.000Z`)
+    if (dataFinal)   q = q.lt ('criado_em', fimDoDia(dataFinal))
+  } else if (dias > 0) {
     const since = new Date()
     since.setDate(since.getDate() - dias)
     q = q.gte('criado_em', since.toISOString())
